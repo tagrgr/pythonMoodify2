@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# spotify_client.py
 # Minimal Spotify client: auth, token refresh, add track to playlist
 # Usage examples (first run requires manual code paste):
 #   python spotify_client.py --auth-url
@@ -14,7 +12,6 @@ import requests
 from urllib.parse import quote
 
 try:
-    # Optional: load a local .env file if present (pip install python-dotenv)
     from dotenv import load_dotenv
     load_dotenv()
 except Exception:
@@ -32,7 +29,7 @@ class Spotify:
         b64 = base64.b64encode(f"{client_id}:{client_secret}".encode("utf-8")).decode("utf-8")
         self.basic_auth = f"Basic {b64}"
 
-    # ---------- Auth ----------
+    # Auth
     def create_auth_url(self, scope: str) -> str:
         """
         Return the URL to visit for user consent.
@@ -119,7 +116,7 @@ class Spotify:
         if not self.access_token:
             raise RuntimeError("Tokens not found. Run with --auth-url, visit it, then use --exchange-code <code>.")
 
-    # ---------- Low-level API ----------
+    # Low-level API
     def api_get(self, endpoint, base="https://api.spotify.com/v1"):
         self.get_tokens()
         r = requests.get(
@@ -146,7 +143,7 @@ class Spotify:
             raise RuntimeError(f"POST {endpoint} failed: {r.status_code} {r.text}")
         return r
 
-    # ---------- Helpers ----------
+    # Helpers
     @staticmethod
     def uri(id, type="track"):
         return f"spotify:{type}:{id}"
@@ -180,46 +177,6 @@ def parse_args():
     p.add_argument("--create-playlist", nargs=1, metavar="NAME", help="Create a new playlist with given name")
 
     return p.parse_args()
-
-
-# def main():
-#     # Read config from env or .env
-#     client_id = os.getenv("SPOTIFY_CLIENT_ID") or ""
-#     client_secret = os.getenv("SPOTIFY_CLIENT_SECRET") or ""
-#     redirect_uri = os.getenv("SPOTIFY_REDIRECT_URI")
-#     scope = os.getenv(
-#         "SPOTIFY_SCOPE",
-#         "playlist-modify-public playlist-read-collaborative playlist-modify-private",
-#     )
-
-#     if not client_id or not client_secret:
-#         raise SystemExit("Set SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET in your environment or .env file.")
-
-#     sp = Spotify(client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri)
-
-#     args = parse_args()
-
-#     if args.auth_url:
-#         print(sp.create_auth_url(scope))
-#         return
-
-#     if args.exchange_code:
-#         sp.get_tokens(code=args.exchange_code)
-#         print("Tokens saved.")
-#         return
-
-#     if args.add_track:
-#         playlist_id, track_id = args.add_track
-#         res = sp.add_song_to_playlist(playlist_id, track_id)
-#         print(json.dumps(res, indent=2))
-#         return
-    
-    
-
-#     # Default action: just ensure tokens are valid (refresh if needed)
-#     sp.get_tokens()
-#     print("Access token ready.")
-
 
 def main():
     import os, json  # ensure json is available here
@@ -256,7 +213,7 @@ def main():
         print(json.dumps(res, indent=2))
         return
 
-    # NEW: create playlist once
+    #create playlist once
     if args.create_playlist:
         playlist_name = args.create_playlist[0]
         res = sp.create_playlist(
@@ -269,10 +226,9 @@ def main():
         print(f"ID: {res['id']}")
         return
 
-    # Default: just ensure tokens are valid (refresh if needed)
+    #  just ensure tokens are valid (refresh if needed)
     sp.get_tokens()
     print("Access token ready.")
-
 
 if __name__ == "__main__":
     main()

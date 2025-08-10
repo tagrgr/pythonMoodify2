@@ -166,7 +166,7 @@ def find_tracks(sp: Spotify, mood: dict, limit: int = 10):
     val_min, val_max = mood["valence"]
     tempo_min, tempo_max = mood["tempo"]
 
-    # --- Attempt 1: Recommendations API ---
+    # Attempt 1: Recommendations API
     try:
         params = {
             "seed_genres": ",".join(seeds),
@@ -202,7 +202,7 @@ def find_tracks(sp: Spotify, mood: dict, limit: int = 10):
         # We'll fall back below
         pass
 
-    # --- Attempt 2: Fallback via Search API by genre ---
+    #Attempt 2: Fallback via Search API by genr
     collected = []
     market = os.getenv("SPOTIFY_MARKET", "IE")
     for seed in seeds:

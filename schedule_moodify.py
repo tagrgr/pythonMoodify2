@@ -1,4 +1,3 @@
-# schedule_moodify.py
 import os
 import logging
 from pathlib import Path
@@ -9,13 +8,13 @@ from apscheduler.triggers.cron import CronTrigger
 # Import your runner
 from weather_playlist import main as run_moodify
 
-# --- Settings via .env or environment ---
+# Settings via .env or environment
 TZ = os.getenv("TZ", "Europe/Dublin")          # your local timezone
 RUN_TIME = os.getenv("RUN_TIME", "07:00")      # 24h "HH:MM"
 TRACK_COUNT = os.getenv("TRACK_COUNT", None)   # optional override
 DRY_RUN = os.getenv("DRY_RUN", None)           # "true"/"false" if you want
 
-# --- Logging ---
+# Logging
 LOG_DIR = Path("logs")
 LOG_DIR.mkdir(exist_ok=True)
 logging.basicConfig(
@@ -45,9 +44,9 @@ def job():
     logging.info("Moodify run starting…")
     try:
         run_moodify()
-        logging.info("Moodify run finished ✅")
+        logging.info("Moodify run finished")
     except Exception:
-        logging.exception("Moodify run failed ❌")
+        logging.exception("Moodify run failed")
 
 if __name__ == "__main__":
     tz = ZoneInfo(TZ)
