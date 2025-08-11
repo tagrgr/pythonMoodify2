@@ -1,0 +1,8 @@
+2025-08-11 17:44:54,353 | INFO | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-08-11 17:44:54,353 | INFO | Scheduled daily at 17:45 (Europe/Dublin). Log: logs\scheduler.log
+2025-08-11 17:44:54,354 | INFO | Added job "job" to job store "default"
+2025-08-11 17:44:54,355 | INFO | Scheduler started
+2025-08-11 17:45:00,017 | INFO | Running job "job (trigger: cron[hour='17', minute='45'], next run at: 2025-08-11 17:45:00 IST)" (scheduled at 2025-08-11 17:45:00+01:00)
+2025-08-11 17:45:00,018 | INFO | Moodify run starting…
+2025-08-11 17:45:01,992 | INFO | Moodify run finished
+2025-08-11 17:45:01,992 | INFO | Job "job (trigger: cron[hour='17', minute='45'], next run at: 2025-08-12 17:45:00 IST)" executed successfully

@@ -19,11 +19,20 @@ except Exception:
 
 
 class Spotify:
+    # def __init__(self, client_id, client_secret, redirect_uri, token_file="spotify_tokens.json"):
+    #     self.client_id = client_id
+    #     self.client_secret = client_secret
+    #     self.redirect_uri = redirect_uri
+    #     self.token_file = token_file
+    #     self.access_token = None
+    #     self.refresh_token = None
+    #     b64 = base64.b64encode(f"{client_id}:{client_secret}".encode("utf-8")).decode("utf-8")
+    #     self.basic_auth = f"Basic {b64}"
     def __init__(self, client_id, client_secret, redirect_uri, token_file="spotify_tokens.json"):
         self.client_id = client_id
         self.client_secret = client_secret
         self.redirect_uri = redirect_uri
-        self.token_file = token_file
+        self.token_file = token_file  # can be None for ephemeral/no-file use
         self.access_token = None
         self.refresh_token = None
         b64 = base64.b64encode(f"{client_id}:{client_secret}".encode("utf-8")).decode("utf-8")
@@ -44,12 +53,31 @@ class Spotify:
             f"scope={quote(scope_str, safe='')}"
         )
 
+    # def _save_tokens(self, tokens: dict):
+    #     with open(self.token_file, "w", encoding="utf-8") as f:
+    #         json.dump(tokens, f, ensure_ascii=False, indent=2)
     def _save_tokens(self, tokens: dict):
+        if not self.token_file:
+            return  # skip writing in CI
         with open(self.token_file, "w", encoding="utf-8") as f:
             json.dump(tokens, f, ensure_ascii=False, indent=2)
 
+    # def _load_tokens(self):
+    #     if os.path.exists(self.token_file):
+    #         with open(self.token_file, "r", encoding="utf-8") as f:
+    #             data = json.load(f)
+    #             self.access_token = data.get("access_token")
+    #             self.refresh_token = data.get("refresh_token")
+    #             return data
+    #     return None
     def _load_tokens(self):
-        if os.path.exists(self.token_file):
+        # Prefer env var first
+        env_rt = os.getenv("SPOTIFY_REFRESH_TOKEN")
+        if env_rt:
+            self.refresh_token = env_rt
+            return {"refresh_token": env_rt}
+        # Then file
+        if self.token_file and os.path.exists(self.token_file):
             with open(self.token_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 self.access_token = data.get("access_token")
@@ -57,17 +85,74 @@ class Spotify:
                 return data
         return None
 
+    # def get_tokens(self, code: str | None = None):
+    #     """
+    #     Ensure we have a fresh access token:
+    #     1) load from file
+    #     2) refresh if we have refresh_token
+    #     3) exchange authorization code if provided
+    #     """
+    #     if not self.access_token or not self.refresh_token:
+    #         self._load_tokens()
+
+    #     # Refresh path
+    #     if self.refresh_token and not code:
+    #         r = requests.post(
+    #             "https://accounts.spotify.com/api/token",
+    #             headers={
+    #                 "Authorization": self.basic_auth,
+    #                 "Content-Type": "application/x-www-form-urlencoded",
+    #             },
+    #             data={
+    #                 "grant_type": "refresh_token",
+    #                 "refresh_token": self.refresh_token,
+    #             },
+    #             timeout=20,
+    #         )
+    #         if r.status_code != 200:
+    #             raise RuntimeError(f"Refresh failed: {r.status_code} {r.text}")
+    #         data = r.json()
+    #         self.access_token = data["access_token"]
+    #         if "refresh_token" in data:
+    #             self.refresh_token = data["refresh_token"]
+    #         self._save_tokens({"access_token": self.access_token, "refresh_token": self.refresh_token})
+    #         return
+
+    #     # First-time code exchange
+    #     if code and not self.access_token:
+    #         r = requests.post(
+    #             "https://accounts.spotify.com/api/token",
+    #             headers={
+    #                 "Authorization": self.basic_auth,
+    #                 "Content-Type": "application/x-www-form-urlencoded",
+    #             },
+    #             data={
+    #                 "grant_type": "authorization_code",
+    #                 "code": code,
+    #                 "redirect_uri": self.redirect_uri,
+    #             },
+    #             timeout=20,
+    #         )
+    #         if r.status_code != 200:
+    #             raise RuntimeError(f"Code exchange failed: {r.status_code} {r.text}")
+    #         data = r.json()
+    #         self.access_token = data["access_token"]
+    #         self.refresh_token = data["refresh_token"]
+    #         self._save_tokens({"access_token": self.access_token, "refresh_token": self.refresh_token})
+    #         return
+
+    #     if not self.access_token:
+    #         raise RuntimeError("Tokens not found. Run with --auth-url, visit it, then use --exchange-code <code>.")
     def get_tokens(self, code: str | None = None):
         """
         Ensure we have a fresh access token:
-        1) load from file
-        2) refresh if we have refresh_token
-        3) exchange authorization code if provided
+        - if env/file provides refresh_token -> refresh
+        - else if authorization code provided -> exchange
         """
         if not self.access_token or not self.refresh_token:
             self._load_tokens()
 
-        # Refresh path
+        # Refresh path (preferred in CI)
         if self.refresh_token and not code:
             r = requests.post(
                 "https://accounts.spotify.com/api/token",
@@ -75,10 +160,7 @@ class Spotify:
                     "Authorization": self.basic_auth,
                     "Content-Type": "application/x-www-form-urlencoded",
                 },
-                data={
-                    "grant_type": "refresh_token",
-                    "refresh_token": self.refresh_token,
-                },
+                data={"grant_type": "refresh_token", "refresh_token": self.refresh_token},
                 timeout=20,
             )
             if r.status_code != 200:
@@ -90,19 +172,12 @@ class Spotify:
             self._save_tokens({"access_token": self.access_token, "refresh_token": self.refresh_token})
             return
 
-        # First-time code exchange
+        # First-time code exchange (local only)
         if code and not self.access_token:
             r = requests.post(
                 "https://accounts.spotify.com/api/token",
-                headers={
-                    "Authorization": self.basic_auth,
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                data={
-                    "grant_type": "authorization_code",
-                    "code": code,
-                    "redirect_uri": self.redirect_uri,
-                },
+                headers={"Authorization": self.basic_auth, "Content-Type": "application/x-www-form-urlencoded"},
+                data={"grant_type": "authorization_code", "code": code, "redirect_uri": self.redirect_uri},
                 timeout=20,
             )
             if r.status_code != 200:
@@ -114,7 +189,7 @@ class Spotify:
             return
 
         if not self.access_token:
-            raise RuntimeError("Tokens not found. Run with --auth-url, visit it, then use --exchange-code <code>.")
+            raise RuntimeError("Tokens not found. Run auth flow locally or set SPOTIFY_REFRESH_TOKEN.")
 
     # Low-level API
     def api_get(self, endpoint, base="https://api.spotify.com/v1"):
@@ -148,9 +223,9 @@ class Spotify:
     def uri(id, type="track"):
         return f"spotify:{type}:{id}"
 
-    def add_song_to_playlist(self, playlist_id, track_id):
-        payload = {"uris": [self.uri(track_id)]}
-        return self.api_post(f"/playlists/{playlist_id}/tracks", payload).json()
+    # def add_song_to_playlist(self, playlist_id, track_id):
+    #     payload = {"uris": [self.uri(track_id)]}
+    #     return self.api_post(f"/playlists/{playlist_id}/tracks", payload).json()
 
     def add_song_to_playlist(self, playlist_id, song_id):
         data = {"uris": [self.uri(song_id)]}
