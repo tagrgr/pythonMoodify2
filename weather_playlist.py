@@ -14,7 +14,7 @@ from spotify_client import Spotify
 
 # Config
 OW_API_KEY = os.getenv("OW_API_KEY")  # set in .env
-OW_CITY = os.getenv("OW_CITY", "Dublin,IE")  # e.g., "Dublin,IE"
+OW_CITY = os.getenv("OW_CITY") or "Dublin,IE"  # e.g., "Dublin,IE"
 PLAYLIST_ID = os.getenv("PLAYLIST_ID")
 SUMMARY_DIR = Path("logs")
 SUMMARY_DIR.mkdir(exist_ok=True)
