@@ -264,7 +264,14 @@ def main():
 
     #Optional knobs
     # TRACK_COUNT = int(os.getenv("TRACK_COUNT", "12"))
-    TRACK_COUNT = int(os.getenv("TRACK_COUNT") or 12)
+    # TRACK_COUNT = int(os.getenv("TRACK_COUNT") or 12)
+    def env_int(name, default):
+        v = os.getenv(name)
+        try:
+            return int(v) if v not in (None, "",) else default
+        except ValueError:
+            return default
+    TRACK_COUNT = env_int("TRACK_COUNT", 12)
     DRY_RUN = os.getenv("DRY_RUN", "false").lower() == "true"
  
     # Weather → mood

@@ -67,7 +67,7 @@ jobs:
           OW_API_KEY: ${{ secrets.OW_API_KEY }}
           OW_CITY: ${{ vars.OW_CITY }}
           PLAYLIST_ID: ${{ secrets.PLAYLIST_ID }}
-          TRACK_COUNT: ${{ vars.TRACK_COUNT }}
+          TRACK_COUNT: ${{ vars.TRACK_COUNT || '12' }}
           DRY_RUN: "false"
           MOODIFY_MODE: "scheduler"
         run: python weather_playlist.py
