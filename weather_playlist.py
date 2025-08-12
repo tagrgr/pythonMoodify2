@@ -263,7 +263,8 @@ def main():
         raise SystemExit("Missing PLAYLIST_ID. Put your target playlist ID in .env")
 
     #Optional knobs
-    TRACK_COUNT = int(os.getenv("TRACK_COUNT", "12"))
+    # TRACK_COUNT = int(os.getenv("TRACK_COUNT", "12"))
+    TRACK_COUNT = int(os.getenv("TRACK_COUNT") or 12)
     DRY_RUN = os.getenv("DRY_RUN", "false").lower() == "true"
  
     # Weather → mood
