@@ -1,20 +1,20 @@
 Date: 2025-08-12
 City: Dublin,IE
 Condition: Clear
-Temperature: 24.55°C
+Temperature: 21.51°C
 Mood Genres: indie-pop, rock, pop
 Tracks Added: 12
 
 Track List:
-01. Under Pressure - Remastered 2011 — Queen, David Bowie
-02. Vienna — Billy Joel
-03. the perfect pair — beabadoobee
-04. Ordinary World — Duran Duran
-05. Wild World — Yusuf / Cat Stevens
-06. Master of None — Beach House
-07. Sweet — Cigarettes After Sex
-08. Thunderstruck — AC/DC
-09. Friday I'm In Love — The Cure
-10. Feel It (From “Invincible”) — d4vd
-11. The Less I Know The Better — Tame Impala
-12. Africa — TOTO
+01. Smells Like Teen Spirit — Nirvana
+02. Don't You Want Me — The Human League
+03. Hotel California - 2013 Remaster — Eagles
+04. Paranoid - 2009 Remaster — Black Sabbath
+05. the perfect pair — beabadoobee
+06. Mr. Jones — Counting Crows
+07. How Soon Is Now? - 2011 Remaster — The Smiths
+08. Have You Ever Seen The Rain — Creedence Clearwater Revival
+09. Master of None — Beach House
+10. Drops of Jupiter (Tell Me) — Train
+11. Enter Sandman - Remastered 2021 — Metallica
+12. we never dated — sombr

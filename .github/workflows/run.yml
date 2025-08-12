@@ -56,6 +56,27 @@ jobs:
             echo "ok=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Debug Spotify env
+        if: github.event_name != 'schedule' || steps.gate.outputs.ok == 'true'
+        env:
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          SPOTIFY_REFRESH_TOKEN: ${{ secrets.SPOTIFY_REFRESH_TOKEN }}
+          SPOTIFY_REDIRECT_URI: ${{ secrets.SPOTIFY_REDIRECT_URI }}
+          OW_API_KEY: ${{ secrets.OW_API_KEY }}
+          OW_CITY: ${{ vars.OW_CITY }}
+          PLAYLIST_ID: ${{ secrets.PLAYLIST_ID }}
+          TRACK_COUNT: ${{ vars.TRACK_COUNT || '12' }}
+        run: |
+          [ -n "${SPOTIFY_CLIENT_ID}" ] && echo "CLIENT_ID=present" || echo "CLIENT_ID=<missing>"
+          [ -n "${SPOTIFY_CLIENT_SECRET}" ] && echo "CLIENT_SECRET=present" || echo "CLIENT_SECRET=<missing>"
+          [ -n "${SPOTIFY_REFRESH_TOKEN}" ] && echo "REFRESH_TOKEN=present" || echo "REFRESH_TOKEN=<missing>"
+          echo "REDIRECT_URI=${SPOTIFY_REDIRECT_URI:-<empty>}"
+          echo "OW_CITY=${OW_CITY:-<empty>}"
+          echo "TRACK_COUNT=${TRACK_COUNT:-<empty>}"
+          [ -n "${PLAYLIST_ID}" ] && echo "PLAYLIST_ID=present" || echo "PLAYLIST_ID=<missing>"
+          [ -n "${OW_API_KEY}" ] && echo "OW_API_KEY=present" || echo "OW_API_KEY=<missing>"
+      
       - name: Run weather→playlist
         # run if manual OR (scheduled and gate passed)
         if: github.event_name != 'schedule' || steps.gate.outputs.ok == 'true'
