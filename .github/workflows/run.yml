@@ -22,29 +22,6 @@ jobs:
       - name: Install deps
         run: pip install -r requirements.txt
 
-      # - name: Gate to 09:00 local (DST-safe)
-      #   id: gate
-      #   run: |
-      #     echo "Local time: $(date)"
-      #     if [ "$(date +%H)" != "09" ]; then
-      #       echo "Not 09:00 Europe/Dublin — exiting."
-      #       exit 78
-      #     fi
-
-      # - name: Run weather→playlist
-      #   if: steps.gate.outcome == 'success'
-      #   env:
-      #     SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
-      #     SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
-      #     SPOTIFY_REFRESH_TOKEN: ${{ secrets.SPOTIFY_REFRESH_TOKEN }}
-      #     SPOTIFY_REDIRECT_URI: ${{ secrets.SPOTIFY_REDIRECT_URI }} # any string; not used during refresh
-      #     OW_API_KEY: ${{ secrets.OW_API_KEY }}
-      #     OW_CITY: ${{ vars.OW_CITY }}
-      #     PLAYLIST_ID: ${{ secrets.PLAYLIST_ID }}
-      #     TRACK_COUNT: ${{ vars.TRACK_COUNT }}
-      #     DRY_RUN: "false"
-      #     MOODIFY_MODE: "scheduler"
-      #   run: python weather_playlist.py
       - name: Gate to 09:00 Europe/Dublin (scheduled runs only)
         if: github.event_name == 'schedule'
         id: gate

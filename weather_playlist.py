@@ -144,12 +144,20 @@ def get_spotify():
     """Create Spotify client from env and ensure access token is ready."""
     client_id = os.getenv("SPOTIFY_CLIENT_ID")
     client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
-    redirect_uri = os.getenv("SPOTIFY_REDIRECT_URI")
-    if not client_id or not client_secret or not redirect_uri:
-        raise SystemExit("Missing Spotify config: set SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_REDIRECT_URI in .env")
-    sp = Spotify(client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri)
-    sp.get_tokens()  # loads/refreshes token from spotify_tokens.json
+    redirect_uri = os.getenv("SPOTIFY_REDIRECT_URI") or "https://moodle.cct.ie/course/view.php?id=2183"
+
+    if not client_id or not client_secret:
+        raise SystemExit("Missing Spotify config: set SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET")
+
+    sp = Spotify(
+        client_id=client_id,
+        client_secret=client_secret,
+        redirect_uri=redirect_uri,
+        token_file=None
+    )
+    sp.get_tokens()  # will use SPOTIFY_REFRESH_TOKEN from env (per spotify_client.py patch)
     return sp
+
 
 def find_tracks(sp: Spotify, mood: dict, limit: int = 10):
     """
