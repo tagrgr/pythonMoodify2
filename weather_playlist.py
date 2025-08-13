@@ -149,11 +149,14 @@ def get_spotify():
     if not client_id or not client_secret:
         raise SystemExit("Missing Spotify config: set SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET")
 
+    use_ci = (os.getenv("CI") == "true")
+    token_file = None if use_ci else "spotify_tokens.json"
+
     sp = Spotify(
         client_id=client_id,
         client_secret=client_secret,
         redirect_uri=redirect_uri,
-        token_file=None
+        token_file=token_file,
     )
     sp.get_tokens()  # will use SPOTIFY_REFRESH_TOKEN from env (per spotify_client.py patch)
     return sp
