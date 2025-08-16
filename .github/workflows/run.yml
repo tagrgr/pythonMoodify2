@@ -44,7 +44,16 @@ jobs:
           OW_CITY: ${{ vars.OW_CITY }}
           PLAYLIST_ID: ${{ secrets.PLAYLIST_ID }}
           TRACK_COUNT: ${{ vars.TRACK_COUNT || '12' }}
+          DRY_RUN: "false"
+          MOODIFY_MODE: "scheduler"
         run: |
+          for i in 1 2 3; do
+            python weather_playlist.py && exit 0
+            echo "Attempt $i failed; retrying..." >&2
+            sleep $((i*15))
+          done
+          echo "All attempts failed." >&2
+          exit 1
           [ -n "${SPOTIFY_CLIENT_ID}" ] && echo "CLIENT_ID=present" || echo "CLIENT_ID=<missing>"
           [ -n "${SPOTIFY_CLIENT_SECRET}" ] && echo "CLIENT_SECRET=present" || echo "CLIENT_SECRET=<missing>"
           [ -n "${SPOTIFY_REFRESH_TOKEN}" ] && echo "REFRESH_TOKEN=present" || echo "REFRESH_TOKEN=<missing>"
